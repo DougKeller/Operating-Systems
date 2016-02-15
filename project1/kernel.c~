@@ -1,0 +1,16 @@
+void printString(char*);
+
+void main() {
+	printString("Hello World!\0");
+	while(1);
+}
+
+void printString(char* message) {
+	int i;
+	int messageLength = sizeof(message) / sizeof(char);
+
+	for(i = 0; i < messageLength; i++) {
+		interrupt(16, 14 * 256 + message[i], 0, 0, 0);
+		i++;
+	}
+}
