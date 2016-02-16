@@ -13,30 +13,31 @@ void main() {
     char line[80];
     int x;
 
-    clearScreen(4, 11);
+    makeInterrupt21();
 
-    printString("\r\n  oooooooooo.   oooo    oooo         oooooooooo.     .oooooo.    .oooooo..o\0"); 
-    printString("\r\n  `888'   `Y8b  `888   .8P'          `888'   `Y8b   d8P'  `Y8b  d8P'    `Y8\0"); 
-    printString("\r\n   888      888  888  d8'             888      888 888      888 Y88bo.     \0"); 
-    printString("\r\n   888      888  88888[               888      888 888      888  `\"Y8888o. \0"); 
-    printString("\r\n   888      888  888`88b.    8888888  888      888 888      888      `\"Y88b\0"); 
-    printString("\r\n   888     d88'  888  `88b.           888     d88' `88b    d88' oo     .d8P\0"); 
-    printString("\r\n  o888bood8P'   o888o  o888o         o888bood8P'    `Y8bood8P'  8""888888P' \0"); 
-          
-    printString("\r\n");                
-    printString("\r\nEnter a line: \0");
-    readString(line);
-    printString("\r\nYou typed: \0");
-    printString(line);
+    interrupt(33, 12, 4, 11, 0);
 
-    printString("\r\n\0");
-    printString("Enter a number: \0");
-    readInt(&x);
-    printString("\r\n\0");
-    printString("You entered \0");
-    writeInt(x);
+    interrupt(33, 0, "\r\n  oooooooooo.   oooo    oooo         oooooooooo.     .oooooo.    .oooooo..o\0", 0, 0); 
+    interrupt(33, 0, "\r\n  `888'   `Y8b  `888   .8P'          `888'   `Y8b   d8P'  `Y8b  d8P'    `Y8\0", 0, 0); 
+    interrupt(33, 0, "\r\n   888      888  888  d8'             888      888 888      888 Y88bo.     \0", 0, 0); 
+    interrupt(33, 0, "\r\n   888      888  88888[               888      888 888      888  `\"Y8888o. \0", 0, 0); 
+    interrupt(33, 0, "\r\n   888      888  888`88b.    8888888  888      888 888      888      `\"Y88b\0", 0, 0); 
+    interrupt(33, 0, "\r\n   888     d88'  888  `88b.           888     d88' `88b    d88' oo     .d8P\0", 0, 0); 
+    interrupt(33, 0, "\r\n  o888bood8P'   o888o  o888o         o888bood8P'    `Y8bood8P'  8""888888P' \0", 0, 0); 
+           
+    interrupt(33, 0, "\r\n", 0, 0);               
+    interrupt(33, 0, "\r\nEnter a line: \0", 0, 0);
+    interrupt(33, 1, line, 0, 0);
+    interrupt(33, 0, "\r\nYou typed: \0", 0, 0);
+    interrupt(33, 0, line, 0, 0);
 
-    printString("\r\n\0");
+    interrupt(33, 0, "\r\n\0", 0, 0);
+    interrupt(33, 0, "Enter a number: \0", 0, 0);
+    interrupt(33, 14, &x, 0, 0);
+    interrupt(33, 0, "\r\n\0", 0, 0);
+    interrupt(33, 0, "You entered \0", 0, 0);
+    interrupt(33, 13, x, 0, 0);
+    interrupt(33, 0, "\r\n\0", 0, 0);
 
     while(1);
 }
@@ -88,7 +89,7 @@ void clearScreen(int bx, int cx) {
     int i = 0;
     int bh = 4096 * (bx - 1) + 256 * (cx - 1);
 
-    printString("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\0");
+    interrupt(33, 0, "\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\0", 0, 0);
     interrupt(16, 512, 0, 0, 0);
 
     if(bx > 0 && bx <= 8 && cx > 0 && cx <= 16) {
@@ -117,7 +118,7 @@ void writeInt(int x) {
     int q = x, r;
 
     if(q == 0) {
-        printString("0\0");
+        interrupt(33, 0, "0\0", 0, 0);
         return;
     }
 
@@ -133,7 +134,7 @@ void writeInt(int x) {
     }
 
     d++;
-    printString(d);
+    interrupt(33, 0, d, 0, 0);
 }
 
 void readInt(int* address) {
