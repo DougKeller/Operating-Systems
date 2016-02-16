@@ -1,11 +1,18 @@
 Douglas Keller
+
 dwk24@zips.uakron.edu
+
 Operating Systems
+
 Project 1
+
 15 February 2016
 
+
 What was done:
+
 	Created a basic kernel in C
+	
 		- Print strings terminated by NULL
 		- Read strings up to 80 characters long from the user (including 0x0)
 			* Clear the last character if BACKSPACE is typed
@@ -24,5 +31,6 @@ What was done:
 		- Create a handler for interrupt 21 to unify the above functions
 
 How to verify:
+
 	- Compile the OS by running compileOS.sh
 	- Launch floppya.img in an a virtual machine (Bochs, VirtualBox, etc)
