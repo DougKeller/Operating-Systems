@@ -20,8 +20,8 @@ What was done:
 		- Interrupt 4: Load a program into memory and execute it
 		- Interrupt 5: Create a stop function for halting program execution
 		- Interrupt 15: Create an error function for displaying error messages
-			* File Not Found error
-			* General error
+			* 0: File Not Found error
+			* Default: General error
 
 How to verify:
 
