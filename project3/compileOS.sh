@@ -37,4 +37,4 @@ ld86 -o Shell -d Shell.o lib_asm.o
 ./loadFile test1
 ./loadFile test2
 ./loadFile fib
-# ./loadFile Shell
+./loadFile Shell

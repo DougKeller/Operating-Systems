@@ -44,25 +44,10 @@ int mod(int, int);
 int div(int, int);
 
 void main() {
-    char directory[512], fileName[7];
-    int i = 0, j = 0;
-
     makeInterrupt21();
 
-    interrupt(33, 2, directory, 2);
-
-    for(i; i < 512; i += 32) {
-        if(directory[i] >= 'a') {
-            for(j = 0; j < 6; j += 1) {
-                fileName[j] = directory[i + j];
-            }
-            fileName[6] = 0x0;
-            interrupt(33, 0, fileName);
-            interrupt(33, 0, "\r\n\0");
-        }
-    }
-    // interrupt(33, 4, "Shell\0", 2, 0);
-    // interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
+    interrupt(33, 4, "Shell\0", 2, 0);
+    interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
 
     while(1);
 }

@@ -33,6 +33,7 @@ void main() {
     int ax, bx, cx, dx;
 
     CLS;
+    // When this line is uncommented, random characters are printed out
     // PRINTS("Welcome to DK-DOS!\r\n\r\n\0");
 
     while(1) {
