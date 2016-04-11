@@ -44,28 +44,11 @@ int mod(int, int);
 int div(int, int);
 
 void main() {
-    char input[80];
-    char buffer1[512];
-    char buffer2[512];
-    char buffer3[512];
-    int size, i;
     makeInterrupt21();
 
-    interrupt(33, 12, 4, 11, 0);
+    interrupt(33, 4, "Shell\0", 2, 0);
+    interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
 
-    interrupt(33, 0, "\r\n  oooooooooo.   oooo    oooo         oooooooooo.     .oooooo.    .oooooo..o\0", 0, 0);
-    interrupt(33, 0, "\r\n  `888'   `Y8b  `888   .8P'          `888'   `Y8b   d8P'  `Y8b  d8P'    `Y8\0", 0, 0);
-    interrupt(33, 0, "\r\n   888      888  888  d8'             888      888 888      888 Y88bo.     \0", 0, 0);
-    interrupt(33, 0, "\r\n   888      888  88888[               888      888 888      888  `\"Y8888o. \0", 0, 0);
-    interrupt(33, 0, "\r\n   888      888  888`88b.    8888888  888      888 888      888      `\"Y88b\0", 0, 0);
-    interrupt(33, 0, "\r\n   888     d88'  888  `88b.           888     d88' `88b    d88' oo     .d8P\0", 0, 0);
-    interrupt(33, 0, "\r\n  o888bood8P'   o888o  o888o         o888bood8P'    `Y8bood8P'  8""888888P' \0", 0, 0);     
-    interrupt(33, 0, "\r\n\0");
-    interrupt(33, 0, "\r\n\0");
-
-    interrupt(33, 0, "Press enter to begin...\0", 0, 0);
-    interrupt(33, 1, input, 0, 0);
-    interrupt(33, 12, 4, 11, 0);
     while(1);
 }
 
@@ -458,7 +441,7 @@ void runProgram(char* name, int segment) {
 }
 
 void stop() {
-    while(1);
+    launchProgram(8192);
 }
 
 void error(bx) {

@@ -11,17 +11,25 @@ dd if=dir.img of=floppya.img bs=512 count=1 seek=2 conv=notrunc
 # Compile kernel.c
 bcc -ansi -c -o kernel.o kernel.c
 
-# Assemble kernel.asm and link it with kernel
+# Assemble kernel.asm
 as86 kernel.asm -o kernel_asm.o
+
+# Link kernel with kernel.asm
 ld86 -o kernel -d kernel.o kernel_asm.o
 
 # Copy compiled kernel into sector 3 of floppya
 dd if=kernel of=floppya.img bs=512 conv=notrunc seek=3
 
-# Assemble fib
+# Compile fib.c and shell.c
 bcc -ansi -c -o fib.o fib.c
+bcc -ansi -c -o Shell.o Shell.c
+
+# Assemble lib.asm
 as86 lib.asm -o lib_asm.o
+
+# Link fib and shell with lib
 ld86 -o fib -d fib.o lib_asm.o
+ld86 -o Shell -d Shell.o lib_asm.o
 
 # Load files onto floppya.img
 ./loadFile msg
@@ -29,3 +37,4 @@ ld86 -o fib -d fib.o lib_asm.o
 ./loadFile test1
 ./loadFile test2
 ./loadFile fib
+./loadFile Shell
