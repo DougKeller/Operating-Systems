@@ -24,15 +24,14 @@
 // 14: readInt       int   value
 // 15: error         int   code
 
-void getCommand(int*, int*, int*, int*);
-int streql(char*, char*);
+// void runCommand(char*);
+int isCommand(char*, char*);
 void printDir();
 
 void main() {
     char input[80];
-    int ax, bx, cx, dx;
 
-    CLS;
+    interrupt(33, 12, 4, 11, 0);
     // When this line is uncommented, random characters are printed out
     // PRINTS("Welcome to DK-DOS!\r\n\r\n\0");
 
@@ -40,56 +39,25 @@ void main() {
         PRINTS("cxxxx][======> \0");
 
         // Get a command from the user
-        getCommand(&ax, &bx, &cx, &dx);
+        SCANS(input);
+        PRINTS("\r\n\0");
 
-        // Execute the command
-        if(ax >= 0) {
-            interrupt(33, ax, bx, cx, dx);
+        if(isCommand("dir\0", input)) {
+            printDir();
         }
     }
 }
 
-void getCommand(int* ax, int* bx, int* cx, int* dx) {
-    char input[80];
+int isCommand(char* command, char* input) {
     int i = 0;
-
-    *ax = *bx = *cx = *dx = 0;
-
-    // Read the user's input
-    SCANS(input);
-    PRINTS("\r\n\0");
-
-    // Read the first word of input
-    while(input[i] != 0x0 && input[i] != ' ') {
-        i += 1;
-    }
-    input[i] = 0x0;
-
-    if(streql(input, "boot\0")) {
-        *ax = 11;
-    } else if(streql(input, "cls\0")) {
-        *ax = 12;
-        *bx = 4;
-        *cx = 11;
-    } else if(streql(input, "dir\0")) {
-        // printDir();
-        *ax = -1;
-    } else {
-        *ax = 15;
-    }
-}
-
-int streql(char* a, char* b) {
-    int i = 0;
-    while(a[i] == b[i]) {
-        if(a[i] == 0x0) {
-            return 1;
+    while(input[i] && command[i]) {
+        if(input[i] != command[i]) {
+            return 0;
         }
-
         i += 1;
     }
 
-    return 0;
+    return command[i] == 0x0;
 }
 
 void printDir() {
