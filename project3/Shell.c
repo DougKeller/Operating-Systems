@@ -26,13 +26,14 @@
 
 void getCommand(int*, int*, int*, int*);
 int streql(char*, char*);
+void printDir();
 
 void main() {
     char input[80];
     int ax, bx, cx, dx;
 
     CLS;
-    PRINTS("Welcome to DK-DOS!\r\n\r\n\0");
+    // PRINTS("Welcome to DK-DOS!\r\n\r\n\0");
 
     while(1) {
         PRINTS("cxxxx][======> \0");
@@ -41,13 +42,17 @@ void main() {
         getCommand(&ax, &bx, &cx, &dx);
 
         // Execute the command
-        interrupt(33, ax, bx, cx, dx);
+        if(ax >= 0) {
+            interrupt(33, ax, bx, cx, dx);
+        }
     }
 }
 
 void getCommand(int* ax, int* bx, int* cx, int* dx) {
     char input[80];
     int i = 0;
+
+    *ax = *bx = *cx = *dx = 0;
 
     // Read the user's input
     SCANS(input);
@@ -66,6 +71,7 @@ void getCommand(int* ax, int* bx, int* cx, int* dx) {
         *bx = 4;
         *cx = 11;
     } else if(streql(input, "dir\0")) {
+        // printDir();
         *ax = -1;
     } else {
         *ax = 15;
@@ -83,4 +89,22 @@ int streql(char* a, char* b) {
     }
 
     return 0;
+}
+
+void printDir() {
+    char directory[512], fileName[7];
+    int i = 0, j = 0;
+
+    interrupt(33, 2, directory, 2);
+
+    for(i; i < 512; i += 32) {
+        if(directory[i] >= 'a') {
+            for(j = 0; j < 6; j += 1) {
+                fileName[j] = directory[i + j];
+            }
+            fileName[6] = 0x0;
+            PRINTS(fileName);
+            PRINTS("\r\n\0");
+        }
+    }
 }
