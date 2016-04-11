@@ -1,4 +1,6 @@
-﻿/* ACADEMIC INTEGRITY PLEDGE                                              */
+#include "blackdos.h"
+
+/* ACADEMIC INTEGRITY PLEDGE                                              */
 /*                                                                        */
 /* - I have not used source code obtained from another student nor        */
 /*   any other unauthorized source, either modified or unmodified.        */
@@ -43,14 +45,69 @@ void readInt(int*);
 int mod(int, int);
 int div(int, int);
 
+// START SHELL
+void printDir();
+int isCommand(char*, char*);
+
 void main() {
+    char input[80];
     makeInterrupt21();
+
+    CLS;
+
+    while(1) {
+        PRINTS("cxxxx][======> \0");
+
+        // Get a command from the user
+        SCANS(input);
+        PRINTS("\r\n\0");
+
+        if(isCommand("boot\0", input)) {
+            interrupt(33, 11, 0, 0, 0);
+        } else if(isCommand("cls\0", input)) {
+            CLS;
+        } else if(isCommand("dir\0", input)) {
+            printDir();
+        }
+    }
 
     interrupt(33, 4, "Shell\0", 2, 0);
     interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
 
     while(1);
 }
+
+int isCommand(char* command, char* input) {
+    int i = 0;
+    while(input[i] && command[i]) {
+        if(input[i] != command[i]) {
+            return 0;
+        }
+        i += 1;
+    }
+
+    return command[i] == 0x0;
+}
+
+void printDir() {
+    char directory[512], fileName[7];
+    int i = 0, j = 0;
+
+    interrupt(33, 2, directory, 2);
+
+    for(i; i < 512; i += 32) {
+        if(directory[i] >= 'a') {
+            for(j = 0; j < 6; j += 1) {
+                fileName[j] = directory[i + j];
+            }
+            fileName[6] = 0x0;
+            PRINTS(fileName);
+            PRINTS("\r\n\0");
+        }
+    }
+}
+
+// END SHELL
 
 void printString(char* message) {
     int i = 0;
@@ -211,7 +268,7 @@ void writeSector(char* address, int sector) {
     int cx = track * 256 + relativeSector;
     int dx = head * 256;
 
-    // Write the provided address into the calculated sector 
+    // Write the provided address into the calculated sector
     interrupt(19, 769, address, cx, dx);
 }
 
@@ -422,7 +479,7 @@ void runProgram(char* name, int segment) {
     char buffer[512];
     int size = 0, baseLoc = segment * 4096;
     int offset;
-    
+
     // Read program file into buffer
     interrupt(33, 3, name, buffer, &size);
 
