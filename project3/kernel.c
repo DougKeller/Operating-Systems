@@ -216,19 +216,19 @@ void readSector(char* address, int sector) {
     int dx = head * 256;
 
     // Load calculated sector into the provided address
-    interrupt(19, 513, address, cx, dx);
+    interrupt(19, ax, address, cx, dx);
 }
 
 void writeSector(char* address, int sector) {
     int relativeSector = mod(sector, 18) + 1;
-    int head = mod(div(sector, 16), 2);
+    int head = mod(div(sector, 18), 2);
     int track = div(sector, 36);
-    int ax = 513;
+    int ax = 769;
     int cx = track * 256 + relativeSector;
     int dx = head * 256;
 
     // Write the provided address into the calculated sector
-    interrupt(19, 769, address, cx, dx);
+    interrupt(19, ax, address, cx, dx);
 }
 
 void readFile(char* fileName, char* buffer, int* size) {
