@@ -39,7 +39,7 @@ void run(char*);
 void tweet(char*);
 void type(char*);
 void help();
-void commandNotFound();
+void commandNotRecognized();
 
 void main() {
     char input[80];
@@ -57,6 +57,7 @@ void main() {
 }
 
 void execCommand(char* command) {
+    // Interpret the user command
     if(isCommand("boot\0", command)) {
         interrupt(33, 11, 0, 0, 0);
     }
@@ -88,12 +89,13 @@ void execCommand(char* command) {
         help();
     }
     else {
-        commandNotFound();
+        commandNotRecognized();
     }
 }
 
 int isCommand(char* command, char* input) {
     int i = 0;
+    // If any charactors do not match, return 0
     while(input[i] && command[i]) {
         if(input[i] != command[i]) {
             return 0;
@@ -105,7 +107,12 @@ int isCommand(char* command, char* input) {
 }
 
 void validateFile(char* fileName) {
-    if(fileName[0] < 'a') {
+    // If the first character of the file name is uppercase, return error
+    if(fileName[0] == 0x0) {
+        interrupt(33, 15, 1, 0, 0);
+        END;
+    }
+    else if(fileName[0] < 'a') {
         interrupt(33, 15, 2, 0, 0);
         END;
     }
@@ -200,8 +207,10 @@ void printDir() {
     char directory[512], fileName[7];
     int i, j;
 
+    // Load the directory sector
     interrupt(33, 2, directory, 2, 0);
 
+    // Print out each file that the user can access
     for(i = 0; i < 512; i += 32) {
         if(directory[i] >= 'a') {
             for(j = 0; j < 6; j += 1) {
@@ -220,7 +229,7 @@ void help() {
     PRINTS("==================================================\r\n\0");
     PRINTS("  boot      (none)         - Reboots DK-DOS\r\n\0");
     PRINTS("  cls       (none)         - Clears the console\r\n\0");
-    PRINTS("  copy      ARG1, ARG2     - Copies file ARG1 into a new file called ARG2\r\n\0");
+    PRINTS("  copy      ARG1, ARG2     - Copies file ARG1 into a new file named ARG2\r\n\0");
     PRINTS("  del       ARG1           - Deletes a file named ARG1\r\n\0");
     PRINTS("  dir       (none)         - Displays files in the directory\r\n\0");
     PRINTS("  echo      ARG1           - Prints message ARG1 in the console\r\n\0");
@@ -231,7 +240,7 @@ void help() {
     PRINTS("                               message in a file named ARG1\r\n\0");
 }
 
-void commandNotFound() {
-    interrupt(33, 15, 50, 0, 0);
+void commandNotRecognized() {
+    PRINTS("Command not recognized.\r\n\0");
     END;
 }
