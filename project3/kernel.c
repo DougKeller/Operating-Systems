@@ -1,5 +1,3 @@
-#include "blackdos.h"
-
 /* ACADEMIC INTEGRITY PLEDGE                                              */
 /*                                                                        */
 /* - I have not used source code obtained from another student nor        */
@@ -27,7 +25,7 @@
 /* 3460:4/526 BlackDOS kernel, Version 1.02, Spring 2016.                 */
 
 void printString(char*);
-void readString(char*);
+void readString(char*, int);
 void clearScreen(int, int);
 void handleInterrupt21(int, int, int, int);
 void readSector(char*, int);
@@ -45,69 +43,26 @@ void readInt(int*);
 int mod(int, int);
 int div(int, int);
 
-// START SHELL
-void printDir();
-int isCommand(char*, char*);
-
 void main() {
-    char input[80];
     makeInterrupt21();
 
-    CLS;
+    interrupt(33, 12, 4, 11, 0);
 
-    while(1) {
-        PRINTS("cxxxx][======> \0");
-
-        // Get a command from the user
-        SCANS(input);
-        PRINTS("\r\n\0");
-
-        if(isCommand("boot\0", input)) {
-            interrupt(33, 11, 0, 0, 0);
-        } else if(isCommand("cls\0", input)) {
-            CLS;
-        } else if(isCommand("dir\0", input)) {
-            printDir();
-        }
-    }
+    interrupt(33, 0, "\r\n  oooooooooo.   oooo    oooo         oooooooooo.     .oooooo.    .oooooo..o\0", 0, 0);
+    interrupt(33, 0, "\r\n  `888'   `Y8b  `888   .8P'          `888'   `Y8b   d8P'  `Y8b  d8P'    `Y8\0", 0, 0);
+    interrupt(33, 0, "\r\n   888      888  888  d8'             888      888 888      888 Y88bo.     \0", 0, 0);
+    interrupt(33, 0, "\r\n   888      888  88888[               888      888 888      888  `\"Y8888o. \0", 0, 0);
+    interrupt(33, 0, "\r\n   888      888  888`88b.    8888888  888      888 888      888      `\"Y88b\0", 0, 0);
+    interrupt(33, 0, "\r\n   888     d88'  888  `88b.           888     d88' `88b    d88' oo     .d8P\0", 0, 0);
+    interrupt(33, 0, "\r\n  o888bood8P'   o888o  o888o         o888bood8P'    `Y8bood8P'  8""888888P' \0", 0, 0);     
+    interrupt(33, 0, "\r\n\0");
+    interrupt(33, 0, "\r\n\0");
 
     interrupt(33, 4, "Shell\0", 2, 0);
     interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
 
     while(1);
 }
-
-int isCommand(char* command, char* input) {
-    int i = 0;
-    while(input[i] && command[i]) {
-        if(input[i] != command[i]) {
-            return 0;
-        }
-        i += 1;
-    }
-
-    return command[i] == 0x0;
-}
-
-void printDir() {
-    char directory[512], fileName[7];
-    int i = 0, j = 0;
-
-    interrupt(33, 2, directory, 2);
-
-    for(i; i < 512; i += 32) {
-        if(directory[i] >= 'a') {
-            for(j = 0; j < 6; j += 1) {
-                fileName[j] = directory[i + j];
-            }
-            fileName[6] = 0x0;
-            PRINTS(fileName);
-            PRINTS("\r\n\0");
-        }
-    }
-}
-
-// END SHELL
 
 void printString(char* message) {
     int i = 0;
@@ -119,9 +74,13 @@ void printString(char* message) {
     }
 }
 
-void readString(char* message) {
+void readString(char* message, int maxLength) {
     int index = 0, lastIndex = 79;
     char inputChar;
+
+    if(maxLength != 0) {
+        lastIndex = maxLength - 1;
+    }
 
     while(index < lastIndex) {
         /* Read the next character */
@@ -250,7 +209,7 @@ void readInt(int* address) {
 
 void readSector(char* address, int sector) {
     int relativeSector = mod(sector, 18) + 1;
-    int head = mod(div(sector, 16), 2);
+    int head = mod(div(sector, 18), 2);
     int track = div(sector, 36);
     int ax = 513;
     int cx = track * 256 + relativeSector;
@@ -307,7 +266,7 @@ void readFile(char* fileName, char* buffer, int* size) {
 
     if(i == 512) {
         // File not found
-        interrupt(33, 15, 0);
+        interrupt(33, 15, 0, 0, 0);
     } else {
         // Filename is at i'th index of directory sector
         j += i;
@@ -362,21 +321,20 @@ void deleteFile(char* fileName) {
 
     if(i == 512) {
         // File not found
-        interrupt(33, 15, 0);
+        interrupt(33, 15, 0, 0, 0);
     } else {
         // Filename is at i'th index of directory sector
         // Set the first character of the file name to 0
         directory[i] = 0x0;
 
-        j += i;
-
-        for(j; j < i + 32; j += 1) {
+        for(j = i + 6; j < i + 32; j += 1) {
             // Set the mapping for each sector to 0
             if(directory[j] == 0) {
                 break;
             }
 
             map[directory[j]] = 0x0;
+            directory[j] = 0x0;
         }
 
         // Update map and directory sectors
@@ -391,8 +349,8 @@ void writeFile(char* fileName, char* data, int numSectors) {
     char buffer[512];
     int i, j, k, m, sector;
 
-    interrupt(33, 2, map, 1);
-    interrupt(33, 2, directory, 2);
+    interrupt(33, 2, map, 1, 0);
+    interrupt(33, 2, directory, 2, 0);
 
     for(i = 0; i < 512; i += 32) {
         // Iterate through every file name in the directory
@@ -464,19 +422,19 @@ void writeFile(char* fileName, char* data, int numSectors) {
             }
 
             // Write buffer to sector
-            interrupt(33, 6, buffer, sector);
+            interrupt(33, 6, buffer, sector, 0);
             map[sector] = 0xff;
             directory[i + j + k] = sector;
         }
 
         // Update map and directory sectors
-        interrupt(33, 6, map, 1);
-        interrupt(33, 6, directory, 2);
+        interrupt(33, 6, map, 1, 0);
+        interrupt(33, 6, directory, 2, 0);
     }
 }
 
 void runProgram(char* name, int segment) {
-    char buffer[512];
+    char buffer[13312];
     int size = 0, baseLoc = segment * 4096;
     int offset;
 
@@ -504,18 +462,19 @@ void stop() {
 void error(bx) {
     switch(bx) {
         case 0:
-            interrupt(33, 0, "File not found\r\n\0");
+            interrupt(33, 0, "File not found\r\n\0", 0, 0);
             break;
         case 1:
-            interrupt(33, 0, "Duplicate or invalid file name\r\n\0");
+            interrupt(33, 0, "Duplicate or invalid file name\r\n\0", 0, 0);
             break;
         case 2:
-            interrupt(33, 0, "Insufficient disk space\r\n\0");
+            interrupt(33, 0, "Insufficient disk space\r\n\0", 0, 0);
             break;
         default:
-            interrupt(33, 0, "General error\r\n\0");
+            interrupt(33, 0, "General error\r\n\0", 0, 0);
             break;
     }
+    interrupt(33, 5, 0, 0, 0);
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx) {
@@ -524,7 +483,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx) {
             printString(bx);
             break;
         case 1:
-            readString(bx);
+            readString(bx, cx);
             break;
         case 2:
             readSector(bx, cx);

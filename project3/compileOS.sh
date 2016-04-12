@@ -20,21 +20,24 @@ ld86 -o kernel -d kernel.o kernel_asm.o
 # Copy compiled kernel into sector 3 of floppya
 dd if=kernel of=floppya.img bs=512 conv=notrunc seek=3
 
-# Compile fib.c and shell.c
-bcc -ansi -c -o fib.o fib.c
+# Compile cal.c, fib.c and shell.c
 bcc -ansi -c -o Shell.o Shell.c
+bcc -ansi -c -o cal.o cal.c
+bcc -ansi -c -o fib.o fib.c
 
 # Assemble lib.asm
 as86 lib.asm -o lib_asm.o
 
-# Link fib and shell with lib
-ld86 -o fib -d fib.o lib_asm.o
+# Link cal, fib and shell with lib
 ld86 -o Shell -d Shell.o lib_asm.o
+ld86 -o cal -d cal.o lib_asm.o
+ld86 -o fib -d fib.o lib_asm.o
 
 # Load files onto floppya.img
-./loadFile msg
+./loadFile Shell
+./loadFile cal
+./loadFile fib
 ./loadFile lonmsg
+./loadFile msg
 ./loadFile test1
 ./loadFile test2
-./loadFile fib
-./loadFile Shell
