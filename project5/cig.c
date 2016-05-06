@@ -1,3 +1,9 @@
+// Douglas Keller
+// Operating Systems
+// Spring 2016
+// dwk24@zips.uakron.edu
+// Project 5
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>		// printf()
