@@ -1,0 +1,17 @@
+Douglas Keller
+dwk24@zips.uakron.edu
+Operating Systems
+Spring 2016
+Project 5
+
+What I did - use the pthread and semaphore libraries to solve the smoker's problem as described in project 5.
+How to compile - gcc -w -std=c99 cig.c -o cig
+How to run - ./cig
+What it does - 
+  1. Initializes all threads (3 agents, 3 pushers, 6 smokers)
+  2. Agents make available two different kinds of resources
+  3. When a resource is made available, pushers watch and alert a smoker that can use the available resources
+  4. When a smoker is alerted, it consumes the resources and smokes a cigarette, then rests for a short period.
+  5. The Agents complete execution once they have released 6 of each of their resources
+  6. The Pushers complete execution once they track and manage resources 12 times
+  7. The Smokers complete execution once they create and smoke 3 cigarettes
